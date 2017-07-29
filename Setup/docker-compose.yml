@@ -11,6 +11,7 @@ services:
 
     php7:
         build: .
+        container_name: webiny-php7
         volumes:
             - ./:/app:delegated
         environment:

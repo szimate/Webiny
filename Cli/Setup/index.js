@@ -121,9 +121,10 @@ class Setup extends Plugin {
                 return;
             }
 
+            // TODO: @webinyDocker
             // Run Webiny installation procedure
             Webiny.info('Running Webiny app installation...');
-            Webiny.shellExecute('php Apps/Webiny/Php/Cli/install.php Webiny');
+            Webiny.shellExecute('docker run --rm --volume $PWD:/app webiny-php php Apps/Webiny/Php/Cli/install.php Webiny');
 
             // Create admin user
             const params = [answers.domain, answers.user, answers.password].join(' ');
