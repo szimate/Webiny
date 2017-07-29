@@ -2,29 +2,21 @@ version: '2'
 
 services:
     nginx:
-        image: nginx:latest
+        image: nginx
         ports:
             - "8050:80"
         volumes:
             - ./:/app
             - ./docker-nginx-default.conf:/etc/nginx/conf.d/default.conf
 
-    php7:
-        build: .
-        container_name: webiny-php7
-        volumes:
-            - ./:/app:delegated
-        environment:
-            XDEBUG_CONFIG: "remote_host=192.168.5.14"
-
     composer:
-        image: composer:latest
+        image: composer
         volumes:
           - ./:/app
         command: install --ignore-platform-reqs --no-scripts
 
     mongodb:
-        image: mongo:latest
+        image: mongo
         environment:
           - MONGO_DATA_DIR=/data/db
           - MONGO_LOG_DIR=/dev/null
@@ -33,3 +25,10 @@ services:
         ports:
             - 8060:27017
         command: mongod --smallfiles --logpath=/dev/null # --quiet
+
+    php7:
+        image: adrian1210/php7
+        volumes:
+            - ./:/app:delegated
+        environment:
+            XDEBUG_CONFIG: "remote_host=192.168.5.14"
