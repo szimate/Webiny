@@ -4,16 +4,23 @@ services:
     nginx:
         image: nginx
         ports:
-            - "8050:80"
+            - "8070:80"
         volumes:
             - ./:/app
-            - ./docker-nginx-default.conf:/etc/nginx/conf.d/default.conf
+            - ./site.conf:/etc/nginx/conf.d/default.conf
+
+    php7:
+        build: .
+        volumes:
+            - ./:/app:delegated
+        environment:
+            XDEBUG_CONFIG: "remote_host=192.168.5.14"
 
     composer:
         image: composer
         volumes:
           - ./:/app
-        command: install --ignore-platform-reqs --no-scripts
+        command: install
 
     mongodb:
         image: mongo
@@ -23,13 +30,5 @@ services:
         volumes:
           - ./data/db:/data/db
         ports:
-            - 8060:27017
+            - 8080:27017
         command: mongod --smallfiles --logpath=/dev/null # --quiet
-
-    php7:
-        build: .
-        # image: adrian1210/php7
-        volumes:
-            - ./:/app:delegated
-        environment:
-            XDEBUG_CONFIG: "remote_host=192.168.5.14"
