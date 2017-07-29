@@ -27,7 +27,8 @@ services:
         command: mongod --smallfiles --logpath=/dev/null # --quiet
 
     php7:
-        image: adrian1210/php7
+        build: .
+        # image: adrian1210/php7
         volumes:
             - ./:/app:delegated
         environment:
