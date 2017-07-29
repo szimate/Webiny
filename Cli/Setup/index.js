@@ -42,8 +42,11 @@ class Setup extends Plugin {
             {
                 type: 'input',
                 name: 'domain',
-                message: 'What\'s your local domain (e.g. http://domain.app:8001)?',
-                validate: Webiny.validate.url
+                message: 'What\'s your local domain?',
+                validate: Webiny.validate.url,
+                default: () => {
+                    return 'http://localhost:8050';
+                }
             },
             {
                 type: 'input',
