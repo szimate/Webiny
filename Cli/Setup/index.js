@@ -41,19 +41,10 @@ class Setup extends Plugin {
         const questions = [
             {
                 type: 'input',
-                name: 'domain',
-                message: 'What\'s your local domain?',
-                validate: Webiny.validate.url,
-                default: () => {
-                    return 'http://localhost:8050';
-                }
-            },
-            {
-                type: 'input',
                 name: 'database',
                 message: 'What\'s your database name?',
                 default: () => {
-                    return 'webiny';
+                    return 'Webiny';
                 }
             },
             {
@@ -77,7 +68,7 @@ class Setup extends Plugin {
         ];
 
         return inquirer.prompt(questions).then(function (answers) {
-            answers.domain = _.trimEnd(answers.domain, '/');
+            answers.domain = 'http://localhost:8070';
 
             const configs = {
                 configSets: Webiny.projectRoot('Configs/ConfigSets.yaml'),
@@ -125,14 +116,17 @@ class Setup extends Plugin {
             }
 
             // TODO: @webinyDocker
+            // Run Docker containers so we can execute install scripts.
+            Webiny.shellExecute('docker-compose up -d');
+
             // Run Webiny installation procedure
             Webiny.info('Running Webiny app installation...');
-            Webiny.shellExecute('docker run --rm --volume $PWD:/app webiny-php php Apps/Webiny/Php/Cli/install.php Webiny');
+            Webiny.shellExecute('docker-compose run php7 php /app/Apps/Webiny/Php/Cli/install.php Webiny');
 
             // Create admin user
             const params = [answers.domain, answers.user, answers.password].join(' ');
             try {
-                let output = Webiny.shellExecute('php Apps/Webiny/Php/Cli/admin.php ' + params, {stdio: 'pipe'});
+                let output = Webiny.shellExecute('docker-compose run php7 php /app/Apps/Webiny/Php/Cli/admin.php ' + params, {stdio: 'pipe'});
                 output = JSON.parse(output);
                 if (output.status === 'created') {
                     Webiny.success('Admin user created successfully!');
@@ -143,48 +137,6 @@ class Setup extends Plugin {
                 }
             } catch (err) {
                 Webiny.failure(err.message);
-            }
-
-            // Virtual host wizard
-            const hostAnswers = {
-                domain: answers.domain
-            };
-
-            const createHost = function () {
-                return inquirer.prompt({
-                    type: 'confirm',
-                    name: 'createHost',
-                    message: 'Would you like us to create a new nginx virtual host for you?',
-                    default: true
-                }).then(function (a) {
-                    if (a.createHost) {
-                        hostAnswers.createHost = true;
-                        return errorLogFile();
-                    }
-                    return answers;
-                });
-            };
-
-            const errorLogFile = function () {
-                return inquirer.prompt({
-                    type: 'input',
-                    name: 'errorLogFile',
-                    message: 'Where do you want to place your error log file (including file name)?',
-                    default: function () {
-                        const server = answers.domain.replace('http://', '').replace('https://', '').split(':')[0];
-                        return '/var/log/nginx/' + server + '-error.log';
-                    }
-                }).then(function (a) {
-                    hostAnswers.errorLogFile = a.errorLogFile;
-                    return setupVirtualHost(hostAnswers);
-                });
-            };
-
-            try {
-                Webiny.shellExecute('nginx -v', {stdio: 'pipe'});
-                return createHost();
-            } catch (err) {
-                // Skip host prompts
             }
         });
     }
