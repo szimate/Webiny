@@ -149,7 +149,9 @@ class Install implements LifeCycleInterface
     protected function installJsDependencies($app)
     {
         if (file_exists($app->getPath() . '/package.json')) {
-            exec('cd ' . $app->getPath() . ' && yarn install');
+            // TODO: @dockerWebiny ovo se moze kroz CLI bas executat ?
+            // vidim da se recimo inicijalna isntalacija JS-a kroz CLI instalira, tj. naredba se iz CLI-ja executa
+            // exec('cd ' . $app->getPath() . ' && yarn install');
         }
     }
 
