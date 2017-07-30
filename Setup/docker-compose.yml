@@ -17,10 +17,11 @@ services:
             XDEBUG_CONFIG: "remote_host=192.168.5.14"
 
     composer:
+        entrypoint: /bin/true
         image: composer
         volumes:
           - ./:/app
-        command: install
+        command: install --ignore-platform-reqs --no-scripts
 
     mongodb:
         image: mongo
