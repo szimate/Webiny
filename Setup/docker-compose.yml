@@ -10,7 +10,7 @@ services:
             - ./docker-nginx-default.conf:/etc/nginx/conf.d/default.conf
 
     php7:
-        build: .
+        image: adrian1210/php
         volumes:
             - ./:/app:delegated
         environment:
