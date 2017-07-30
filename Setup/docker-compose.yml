@@ -16,6 +16,8 @@ services:
             - ./:/app:delegated
         environment:
             XDEBUG_CONFIG: "remote_host=192.168.5.14"
+        links:
+            - mongodb
 
     composer:
         entrypoint: /bin/true
