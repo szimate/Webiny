@@ -1,16 +1,16 @@
 import React from 'react';
 import Webiny from 'webiny';
-import TranslationsModal from './TranslationsList/TranslationsModal';
+import TranslationsModal from './TextsList/TextsModal';
 
 import _ from 'lodash';
 import moment from 'moment';
 import accounting from 'accounting';
 import I18N from './../../I18N';
 
-class TranslationsList extends Webiny.Ui.View {
+class TextsList extends Webiny.Ui.View {
 }
 
-TranslationsList.defaultProps = {
+TextsList.defaultProps = {
     renderer () {
         return (
             <Webiny.Ui.LazyLoad modules={['ViewSwitcher', 'View', 'Button', 'Icon', 'List', 'Input', 'Link']}>
@@ -24,7 +24,7 @@ TranslationsList.defaultProps = {
                                         <Ui.List
                                             connectToRouter
                                             title={this.i18n('Translations')}
-                                            api="/entities/webiny/i18n-translations"
+                                            api="/entities/webiny/i18n-texts"
                                             searchFields="key,placeholder,app"
                                             fields="key,placeholder,app,translations"
                                             sort="-createdOn"
@@ -75,7 +75,7 @@ TranslationsList.defaultProps = {
 
 class i18n {
     constructor() {
-        this.language = '';
+        this.locale = '';
         this.api = null;
         this.cacheKey = null;
 
@@ -84,6 +84,15 @@ class i18n {
          * @type {Array}
          */
         this.modifiers = {
+            date: value => {
+              return 'DATE: ' + value;
+            },
+            time: value => {
+                return 'TIME: ' + value;
+            },
+            datetime: value => {
+                return 'DATETIME: ' + value;
+            },
             plural: (value, parameters) => {
                 // Numbers can be single number or ranges.
                 for (let i = 0; i < parameters.length; i = i + 2) {
@@ -270,7 +279,7 @@ class i18n {
     }
 
     /**
-     * Returns true if given key has a translation for currently selected language.
+     * Returns true if given key has a translation for currently selected locale.
      * @param key
      */
     hasTranslation(key) {
@@ -288,11 +297,11 @@ class i18n {
     }
 
     /**
-     * Returns currently set language.
+     * Returns currently set locale.
      * @returns {string|string|*}
      */
-    getLanguage() {
-        return this.language;
+    getLocale() {
+        return this.locale;
     }
 
     /**
@@ -320,9 +329,9 @@ class i18n {
         return this;
     }
 
-    initialize(language = 'en_GB') {
-        this.language = language;
-        // TODO: Set moment / accounting language settings here
+    initialize(locale = 'en_GB') {
+        this.locale = locale;
+        // TODO: Set moment / accounting locale settings here
 
         // If we have the same cache key, that means we have latest translations - we can safely read from local storage.
         if (this.cacheKey === parseInt(Webiny.LocalStorage.get('Webiny.i18n.cacheKey'))) {
@@ -331,8 +340,8 @@ class i18n {
         }
 
         // If we have a different cache key (or no cache key at all), we must fetch translations from server
-        return this.api.setQuery({language: this.language}).execute().then(apiResponse => {
-            Webiny.LocalStorage.set('Webiny.i18n.language', this.language);
+        return this.api.setQuery({key: this.locale}).execute().then(apiResponse => {
+            Webiny.LocalStorage.set('Webiny.i18n.locale', this.locale);
             Webiny.LocalStorage.set('Webiny.i18n.cacheKey', apiResponse.getData('cacheKey', null));
             Webiny.LocalStorage.set('Webiny.i18n.translations', JSON.stringify(apiResponse.getData('translations')));
             this.translations = _.assign(this.translations, apiResponse.getData('translations'));
@@ -356,4 +365,4 @@ class i18n {
 
 window.webinyi18n = new i18n();
 
-export default TranslationsList;
+export default TextsList;

@@ -214,13 +214,13 @@
         "description": "Allow user to manage languages and translations.",
         "permissions": {
             "entities": {
-                "Apps\\Webiny\\Php\\Entities\\I18NTranslation": {
+                "Apps\\Webiny\\Php\\Entities\\I18NText": {
                     "crudCreate": true,
                     "crudRead": true,
                     "crudUpdate": true,
                     "crudDelete": true
                 },
-                "Apps\\Webiny\\Php\\Entities\\I18NLanguage": {
+                "Apps\\Webiny\\Php\\Entities\\I18NLocale": {
                     "crudDelete": true,
                     "crudUpdate": true,
                     "crudCreate": true,

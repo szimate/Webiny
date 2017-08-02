@@ -142,7 +142,7 @@ EntityBox.defaultProps = {
             <div className="col-lg-4 col-md-6 col-sm-12 col-xs-12">
                 <div className={styles.box}>
                     <div>
-                        <h1 className={styles.title}>{this.props.entity.class}</h1>
+                        <h1 title={this.props.entity.class} className={styles.title}>{this.props.entity.class}</h1>
                         <ClickConfirm
                             onComplete={() => this.props.onRemoveEntity(this.props.entity)}
                             message={this.i18n('Are you sure you want to remove {entity}?', {

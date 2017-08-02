@@ -8,14 +8,14 @@ class Module extends Webiny.App.Module {
 
         this.registerMenus(
             new Menu('I18N', [
-                new Menu('Languages', 'I18N.Languages.List'),
-                new Menu('Translations', 'I18N.Translations.List'),
+                new Menu('Locales', 'I18N.Locales.List'),
+                new Menu('Texts', 'I18N.Texts.List'),
             ], 'icon-tools').setRole('webiny-i18n-manager')
         );
 
         this.registerRoutes(
-            new Webiny.Route('I18N.Translations.List', '/i18n/translations', Views.TranslationsList, 'I18N - List Translations'),
-            new Webiny.Route('I18N.Languages.List', '/i18n/languages', Views.LanguagesList, 'I18N - List Languages')
+            new Webiny.Route('I18N.Texts.List', '/i18n/texts', Views.TextsList, 'I18N - List Texts'),
+            new Webiny.Route('I18N.Locales.List', '/i18n/locales', Views.LocalesList, 'I18N - List Locales')
         );
     }
 }

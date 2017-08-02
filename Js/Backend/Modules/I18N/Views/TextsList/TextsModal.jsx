@@ -58,13 +58,13 @@ class TranslationModal extends Webiny.Ui.ModalComponent {
                                     <Ui.Grid.Col all={12}>
                                         <Ui.Select
                                             name="locale"
-                                            label={this.i18n('Language')}
-                                            placeholder="Select a language..."
-                                            api="/entities/webiny/i18n-languages"
+                                            label={this.i18n('Locale')}
+                                            placeholder="Select a locale..."
+                                            api="/entities/webiny/i18n-locales"
                                             query={{enabled: true}}
-                                            fields="id,label,locale"
+                                            fields="id,label,key"
                                             textAttr="label"
-                                            valueAttr="locale"/>
+                                            valueAttr="key"/>
                                     </Ui.Grid.Col>
                                 </Ui.Grid.Row>
 
@@ -72,7 +72,7 @@ class TranslationModal extends Webiny.Ui.ModalComponent {
                                     <Ui.Grid.Col all={12}>
                                         <Ui.Textarea
                                             label="Text"
-                                            name={`translations.${model.locale}`}
+                                            name={`translations.${model.key}`}
                                             placeholder="Default placeholder text is used."/>
                                     </Ui.Grid.Col>
                                 </Ui.Grid.Row>

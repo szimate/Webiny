@@ -2,31 +2,31 @@ import React from 'react';
 import _ from 'lodash';
 import Webiny from 'webiny';
 
-class AddLanguageModal extends Webiny.Ui.ModalComponent {
+class AddLocaleModal extends Webiny.Ui.ModalComponent {
     renderDialog() {
         const {Button, Modal, Link, Grid, Form, Select} = this.props;
 
         return (
             <Modal.Dialog>
                 <Form
-                    fields="locale,label"
-                    api="/entities/webiny/i18n-languages"
+                    fields="key,label"
+                    api="/entities/webiny/i18n-locales"
                     onSuccessMessage={this.props.onSuccessMessage}
                     onSubmitSuccess={apiResponse => this.hide().then(() => this.props.onSubmitSuccess(apiResponse))}>
                     {(model, form) => (
                         <Modal.Content>
-                            <Modal.Header title="Add language"/>
+                            <Modal.Header title="Add locale"/>
                             <Modal.Body>
                                 <Grid.Row>
                                     <Grid.Col all={12}>
                                         <Form.Error/>
                                         <Form.Loader/>
                                         <Select
-                                            description={this.i18n(`Languages already added are not shown.`)}
-                                            placeholder={this.i18n('Select language to add...')}
-                                            name="locale"
+                                            description={this.i18n(`Locales already added are not shown.`)}
+                                            placeholder={this.i18n('Select locale to add...')}
+                                            name="key"
                                             validate="required"
-                                            api="/entities/webiny/i18n-languages"
+                                            api="/entities/webiny/i18n-locales"
                                             url="/locales/available"/>
                                     </Grid.Col>
                                 </Grid.Row>
@@ -44,11 +44,11 @@ class AddLanguageModal extends Webiny.Ui.ModalComponent {
     }
 }
 
-AddLanguageModal.defaultProps = _.assign({}, Webiny.Ui.ModalComponent.defaultProps, {
+AddLocaleModal.defaultProps = _.assign({}, Webiny.Ui.ModalComponent.defaultProps, {
     onSubmitSuccess: _.noop,
     onSuccessMessage: _.noop
 });
 
-export default Webiny.createComponent(AddLanguageModal, {
+export default Webiny.createComponent(AddLocaleModal, {
     modules: ['Button', 'Modal', 'Link', 'Grid', 'Form', 'Select']
 });

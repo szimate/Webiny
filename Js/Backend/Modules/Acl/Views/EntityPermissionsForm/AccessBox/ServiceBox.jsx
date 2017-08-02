@@ -100,7 +100,7 @@ ServiceBox.defaultProps = {
             <div className="col-lg-4 col-md-6 col-sm-12 col-xs-12">
                 <div className={styles.box}>
                     <div>
-                        <h1 className={styles.title}>{this.props.service.class}</h1>
+                        <h1 title={this.props.service.class} className={styles.title}>{this.props.service.class}</h1>
                         <ClickConfirm
                             onComplete={() => this.props.onRemoveService(this.props.service)}
                             message={this.i18n('Are you sure you want to remove {service}?', {

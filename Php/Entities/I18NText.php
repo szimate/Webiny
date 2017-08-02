@@ -18,7 +18,7 @@ use Webiny\Component\StdLib\StdObject\ArrayObject\ArrayObject;
  * @property string      $placeholder
  * @property ArrayObject $translations
  */
-class I18NTranslation extends AbstractEntity
+class I18NText extends AbstractEntity
 {
     use WebinyTrait;
 
@@ -58,7 +58,18 @@ class I18NTranslation extends AbstractEntity
         $this->attr('app')->char()->setValidators('required')->setToArrayDefault()->setOnce();
         $this->attr('key')->char()->setValidators('required,unique')->setToArrayDefault()->setOnce();
         $this->attr('placeholder')->char()->setValidators('required')->setToArrayDefault()->setOnce();
-        $this->attr('translations')->object()->setToArrayDefault();
+        $this->attr('translations')->object()->setToArrayDefault()->onSet(function ($texts) {
+            // We must check which locales have changed and update cache keys for them
+            foreach ($texts as $locale => $text) {
+                if ($this->translations->key($locale) !== $text) {
+                    $this->on('onAfterSave', function () use ($locale) {
+                        I18NLocale::findByKey($locale)->updateCacheKey()->save();
+                    });
+                }
+            }
+
+            return $texts;
+        });
 
         /**
          * @api.name        Get translation by key
@@ -66,7 +77,7 @@ class I18NTranslation extends AbstractEntity
          * @api.path.key    string  Translation key
          */
         $this->api('GET', 'keys/{$key}', function ($key) {
-            if ($translation = I18NTranslation::findByKey($key)) {
+            if ($translation = I18NText::findByKey($key)) {
                 return $this->apiFormatEntity($translation, $this->wRequest()->getFields());
             }
 
@@ -81,9 +92,9 @@ class I18NTranslation extends AbstractEntity
          */
         $this->api('POST', 'keys', function () {
             $data = $this->wRequest()->getRequestData();
-            $translation = I18NTranslation::findByKey($data['key']);
+            $translation = I18NText::findByKey($data['key']);
             if (!$translation) {
-                $translation = new I18NTranslation();
+                $translation = new I18NText();
                 $translation->key = $data['key'];
                 $translation->placeholder = $data['placeholder'] ?? null;
                 $translation->save();
@@ -108,13 +119,13 @@ class I18NTranslation extends AbstractEntity
             $data = $this->wRequest()->getRequestData();
             $data['translation'] = $data['translation'] ?? '';
 
-            $translation = I18NTranslation::findByKey($key);
+            $translation = I18NText::findByKey($key);
             if ($translation) {
-                /* @var I18NTranslation $translation */
+                /* @var I18NText $translation */
                 $translation->translations->key($data['language'], $data['translation']);
                 $translation->save();
             } else {
-                $translation = new I18NTranslation();
+                $translation = new I18NText();
                 $translation->key = $key;
                 $translation->placeholder = $data['placeholder'] ?? null;
                 $translation->translations->key($data['language'], $data['translation']);
@@ -123,7 +134,7 @@ class I18NTranslation extends AbstractEntity
 
             return $translation;
         })->setBodyValidators([
-            'language' => 'required',
+            'language'    => 'required',
             'placeholder' => 'required'
         ]);
 
@@ -179,16 +190,16 @@ class I18NTranslation extends AbstractEntity
      */
     public static function findByKey($key)
     {
-        return I18NTranslation::findOne(['key' => $key]);
+        return I18NText::findOne(['key' => $key]);
     }
 
-    public function getText($language)
+    public function getText($locale)
     {
-        return $this->translations->key($language);
+        return $this->translations->key($locale);
     }
 
-    public function hasText($language)
+    public function hasText($locale)
     {
-        return $this->translations->key($language);
+        return $this->translations->key($locale);
     }
 }

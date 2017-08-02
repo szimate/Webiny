@@ -1,46 +1,46 @@
 import React from 'react';
 import Webiny from 'webiny';
-import AddLanguageModal from './LanguagesList/AddLanguageModal';
+import AddLocaleModal from './LocalesList/AddLocaleModal';
 
-class LanguagesList extends Webiny.Ui.View {
+class LocalesList extends Webiny.Ui.View {
     constructor() {
         super();
-        this.addLanguageModal = null;
-        this.languagesList = null;
+        this.addLocaleModal = null;
+        this.localesList = null;
     }
 }
 
-LanguagesList.defaultProps = {
+LocalesList.defaultProps = {
     renderer: function render() {
         return (
             <Webiny.Ui.LazyLoad modules={['View', 'List', 'Icon', 'Button']}>
                 {Ui => (
                     <Ui.View.List>
-                        <Ui.View.Header title="I18N - Languages">
-                            <Ui.Button type="primary" align="right" onClick={() => this.addLanguageModal.show()}>
+                        <Ui.View.Header title="I18N - Locales">
+                            <Ui.Button type="primary" align="right" onClick={() => this.addLocaleModal.show()}>
                                 <Ui.Icon icon="icon-plus-circled"/>
-                                Add Language
+                                Add Locale
                             </Ui.Button>
-                            <AddLanguageModal
-                                ref={ref => this.addLanguageModal = ref}
+                            <AddLocaleModal
+                                ref={ref => this.addLocaleModal = ref}
                                 onSuccessMessage={null}
                                 onSubmitSuccess={apiResponse => {
-                                    this.languagesList.loadData();
-                                    Webiny.Growl.success(this.i18n('Language {language} was successfully added!', {
-                                        language: <strong>{apiResponse.getData('entity.label')}</strong>
+                                    this.localesList.loadData();
+                                    Webiny.Growl.success(this.i18n('Locale {locale} was successfully added!', {
+                                        locale: <strong>{apiResponse.getData('entity.label')}</strong>
                                     }));
                                 }}/>
                         </Ui.View.Header>
                         <Ui.View.Body>
                             <Ui.List
                                 connectToRouter
-                                api="/entities/webiny/i18n-languages"
-                                fields="id,enabled,label,locale"
-                                searchFields="id,locale"
-                                ref={ref => this.languagesList = ref}>
+                                api="/entities/webiny/i18n-locales"
+                                fields="id,enabled,label,key"
+                                searchFields="id,key"
+                                ref={ref => this.localesList = ref}>
                                 <Ui.List.Table>
                                     <Ui.List.Table.Row>
-                                        <Ui.List.Table.Field label="Language">
+                                        <Ui.List.Table.Field label="Locale">
                                             {row => row.label}
                                         </Ui.List.Table.Field>
                                         <Ui.List.Table.ToggleField name="enabled" label="Status" align="center"/>
@@ -61,4 +61,4 @@ LanguagesList.defaultProps = {
     }
 };
 
-export default LanguagesList;
+export default LocalesList;

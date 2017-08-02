@@ -1,7 +1,7 @@
-import LanguagesList from './LanguagesList';
-import TranslationsList from './TranslationsList';
+import LocalesList from './LocalesList';
+import TextsList from './TextsList';
 
 export default {
-    LanguagesList,
-    TranslationsList
+    LocalesList,
+    TextsList
 };
