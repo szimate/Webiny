@@ -25,7 +25,13 @@
     {
         "name": "Logger Manager",
         "slug": "webiny-logger-manager",
-        "description": "This roles allows user to manage system error logger.",
+        "description": "This role allows user to manage system error logger.",
         "permissions": ["webiny-logger-manage-logs"]
+    },
+    {
+        "name": "I18N Manager",
+        "slug": "webiny-i18n-manager",
+        "description": "This role allows user to manage languages and translations.",
+        "permissions": ["webiny-i18n"]
     }
 ]

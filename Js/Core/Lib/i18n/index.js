@@ -20,9 +20,10 @@ function replaceVariables(text, values) {
 
     // Let's first check if we need to return pure string or JSX
     let stringOutput = true;
-    _.each(values, (value) => {
-        if (!_.isString(value)) {
+    _.each(values, value => {
+        if (!_.isString(value) && !_.isNumber(value)) {
             stringOutput = false;
+            return false;
         }
     });
 
@@ -50,7 +51,30 @@ class i18n {
         this.language = '';
         this.api = null;
         this.cacheKey = null;
-        this.parsers = [];
+
+        /**
+         * All registered modifiers. We already have built-in modifiers 'count', 'case' and 'if'.
+         * @type {Array}
+         */
+        this.modifiers = {
+            count: (variable, ...parameters) => {
+
+            },
+            if: (variable, value, output1, output2) => {
+                if (variable === value) {
+                    return output1;
+                }
+                return output2;
+            }
+        };
+
+        // Initial parser for parsing modifiers is already built-in.
+        this.parsers = [
+            (output, key, placeholder) => {
+                return output;
+            }
+        ];
+
         this.translations = {};
         this.component = I18N;
 
@@ -123,29 +147,56 @@ class i18n {
         return this;
     }
 
+    /**
+     * Returns all fetched translations.
+     * @returns {*|{}}
+     */
     getTranslations() {
         return this.translations;
     }
 
+    /**
+     * Returns true if given key has a translation for currently selected language.
+     * @param key
+     */
     hasTranslation(key) {
         return _.get(this.translations, key);
     }
 
+    /**
+     * Sets the API endpoint for fetching translations.
+     * @param api
+     * @returns {i18n}
+     */
     setApiEndpoint(api) {
         this.api = api;
         return this;
     }
 
+    /**
+     * Returns currently set language.
+     * @returns {string|string|*}
+     */
     getLanguage() {
         return this.language;
     }
 
-    addParser(callback) {
+    /**
+     * TODO: rename in dayjob
+     * Registers a new parser, which will be called on each translation.
+     * @param callback
+     * @returns {i18n}
+     */
+    registerParser(callback) {
         this.parsers.push(callback);
         return this;
     }
 
-    removeParsers() {
+    /**
+     * Un-registers all parsers.
+     * @returns {i18n}
+     */
+    unregisterParsers() {
         this.parsers = [];
         return this;
     }
@@ -155,21 +206,21 @@ class i18n {
         return this;
     }
 
-    initialize(language) {
+    initialize(language = 'en_GB') {
         this.language = language;
         // TODO: Set moment / accounting language settings here
 
         // If we have the same cache key, that means we have latest translations - we can safely read from local storage.
-        if (this.cacheKey === parseInt(localStorage[`Webiny.i18n.cacheKey`])) {
-            this.translations = JSON.parse(localStorage[`Webiny.i18n.translations`]);
+        if (this.cacheKey === parseInt(Webiny.LocalStorage.get('Webiny.i18n.cacheKey'))) {
+            this.translations = JSON.parse(Webiny.LocalStorage.get('Webiny.i18n.translations'));
             return Promise.resolve();
         }
 
         // If we have a different cache key (or no cache key at all), we must fetch translations from server
         return this.api.setQuery({language: this.language}).execute().then(apiResponse => {
-            localStorage[`Webiny.i18n.language`] = this.language;
-            localStorage[`Webiny.i18n.cacheKey`] = apiResponse.getData('cacheKey', null);
-            localStorage[`Webiny.i18n.translations`] = JSON.stringify(apiResponse.getData('translations'));
+            Webiny.LocalStorage.set('Webiny.i18n.language', this.language);
+            Webiny.LocalStorage.set('Webiny.i18n.cacheKey', apiResponse.getData('cacheKey', null));
+            Webiny.LocalStorage.set('Webiny.i18n.translations', JSON.stringify(apiResponse.getData('translations')));
             this.translations = _.assign(this.translations, apiResponse.getData('translations'));
             return apiResponse;
         });

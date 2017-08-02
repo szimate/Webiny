@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import Webiny from 'webiny';
 import Acl from './Modules/Acl';
+import I18N from './Modules/I18N';
 import Layout from './Modules/Layout';
 import Logger from './Modules/Logger';
 import './Components';
@@ -10,6 +11,7 @@ class Backend extends Webiny.App {
         super('Webiny.Backend');
         this.modules = [
             new Acl(this),
+            new I18N(this),
             new Layout(this),
             new Logger(this)
         ];

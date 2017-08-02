@@ -8,6 +8,7 @@
 namespace Apps\Webiny\Php\DevTools;
 
 use Apps\Webiny\Php\DevTools\Authorization\Authorization;
+use Apps\Webiny\Php\Entities\I18NTranslation;
 use Apps\Webiny\Php\PackageManager\App;
 use Webiny\AnalyticsDb\AnalyticsDb;
 use Webiny\Component\Cache\CacheStorage;
@@ -208,5 +209,43 @@ trait WebinyTrait
     static protected function wApiCache()
     {
         return ApiCache::getInstance();
+    }
+
+    /**
+     * @param       $placeholder
+     * @param array $variables
+     * @param array $options
+     *
+     * @return string
+     */
+    static protected function i18n($placeholder, $variables = [], $options = [])
+    {
+        $namespace = static::class;
+        $namespace = str_replace('\\', '.', $namespace);
+
+        $key = $namespace . '.' . md5($placeholder);
+
+        // TODO: hardcoded for now - get currently selected language from headers I guess ?
+        $language = 'en_GB';
+
+        $text = $placeholder;
+        if ($translation = I18NTranslation::findByKey($key)) {
+            /* @var I18NTranslation $translation */
+            if ($translation->hasText($language)) {
+                $text = $translation->getText($language);
+            }
+        }
+
+        // Match variables
+        preg_match_all('/\{(.*?)\}/', $text, $matches);
+        $matches = $matches[1] ?? [];
+        foreach ($matches as $match) {
+            $variableName = '{' . $match . '}';
+            if (isset($variables[$match]) && strpos($variableName, $text) >= 0) {
+                $text = str_replace($variableName, $variables[$match], $text);
+            }
+        }
+
+        return $text;
     }
 }
