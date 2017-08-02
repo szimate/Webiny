@@ -12,7 +12,7 @@ use Webiny\Component\Crypt\CryptTrait;
 use Webiny\Component\Entity\EntityCollection;
 use Webiny\Component\Mailer\Email;
 use Webiny\Component\Mailer\MailerTrait;
-use Webiny\Component\Mongo\Index\SingleIndex;
+use Webiny\Component\Mongo\Index\CompoundIndex;
 
 /**
  * Class User
@@ -22,6 +22,8 @@ use Webiny\Component\Mongo\Index\SingleIndex;
  * @property string           $password
  * @property string           $firstName
  * @property string           $lastName
+ * @property string           $lastActive
+ * @property string           $lastLogin
  * @property string           $passwordRecoveryCode
  * @property EntityCollection $roles
  * @property bool             $enabled
@@ -40,7 +42,7 @@ class User extends AbstractEntity implements UserInterface
     {
         parent::__construct();
 
-        $this->index(new SingleIndex('email', 'email', false, true));
+        $this->index(new CompoundIndex('email', ['email', 'deletedOn'], false, true));
 
         $this->attr('email')->char()->setValidators('required,email,unique')->onSet(function ($email) {
             return trim(strtolower($email));
@@ -55,7 +57,7 @@ class User extends AbstractEntity implements UserInterface
         $this->attr('firstName')->char()->setValidators('required')->setToArrayDefault();
         $this->attr('lastName')->char()->setValidators('required')->setToArrayDefault();
         $this->attr('password')->char()->onSet(function ($password) {
-            if (!empty($password) && (in_array($password, ['dev', 'admin']) || $this->wValidation()->validate($password, 'minLength:8'))) {
+            if (!empty($password) && $this->wValidation()->validate($password, 'password')) {
                 return $this->wAuth()->createPasswordHash($password);
             }
 

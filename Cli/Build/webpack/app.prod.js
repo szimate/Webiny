@@ -20,7 +20,7 @@ module.exports = function (app, config) {
     const i18nPluginInstance = new i18nPlugin();
     const assetsPlugin = new AssetsPlugin({
         assetRules: config.assetRules,
-        manifestVariable: 'window["webinyMeta"]["' + name + '"].chunks'
+        manifestVariable: 'window["webinyConfig"]["Meta"]["' + name + '"].chunks'
     });
 
     let plugins = [
@@ -77,6 +77,23 @@ module.exports = function (app, config) {
     }
 
     const fileExtensionRegex = /\.(png|jpg|gif|jpeg|mp4|mp3|woff2?|ttf|otf|eot|svg|ico)$/;
+
+    function fileLoaderOptions(name) {
+        return {
+            name,
+            context: path.resolve(Webiny.projectRoot(), app.getSourceDir(), 'Assets'),
+            publicPath: (file) => {
+                return assetsPlugin.generateUrl(file, app.getPath());
+            },
+            outputPath: (file) => {
+                if (file.startsWith('_/')) {
+                    const parts = file.replace(/_\//g, '').split('/Assets/');
+                    file = path.join('external', parts[0], parts[1]);
+                }
+                return file;
+            }
+        }
+    }
 
     return {
         name: name,
@@ -172,13 +189,7 @@ module.exports = function (app, config) {
                     exclude: /node_modules/,
                     include: /\/public\//,
                     loader: 'file-loader',
-                    options: {
-                        context: path.resolve(Webiny.projectRoot(), app.getSourceDir(), 'Assets'),
-                        name: '[path][name].[ext]',
-                        publicPath: (file) => {
-                            return assetsPlugin.generateUrl(file, app.getPath());
-                        }
-                    }
+                    options: fileLoaderOptions('[path][name].[ext]')
                 },
                 {
                     test: fileExtensionRegex,
@@ -187,13 +198,7 @@ module.exports = function (app, config) {
                         /\/public\//
                     ],
                     loader: 'file-loader',
-                    options: {
-                        context: path.resolve(Webiny.projectRoot(), app.getSourceDir(), 'Assets'),
-                        name: '[path][name]-[hash].[ext]',
-                        publicPath: (file) => {
-                            return assetsPlugin.generateUrl(file, app.getPath());
-                        }
-                    }
+                    options: fileLoaderOptions('[path][name]-[hash].[ext]')
                 }
             ]
         },
