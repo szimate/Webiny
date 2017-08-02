@@ -40,14 +40,19 @@ class Auth {
                     const target = document.querySelector('login-overlay');
 
                     const LoginView = this.renderLogin();
+
                     if (LoginView) {
-                        ReactDOM.render(
-                            <LoginView overlay={true} onSuccess={() => {
+                        const props = {
+                            overlay: true,
+                            onSuccess: () => {
                                 this.showLogin = false;
                                 ReactDOM.unmountComponentAtNode(target);
-                            }}/>,
-                            target
-                        );
+                            }
+                        };
+
+                        const {createElement, cloneElement, isValidElement} = React;
+                        const view = isValidElement(LoginView) ? cloneElement(LoginView, props) : createElement(LoginView, props);
+                        ReactDOM.render(view, target);
                     }
                 }
             });
@@ -81,7 +86,7 @@ class Auth {
     }
 
     checkRouteRole(routerEvent) {
-        if (webinyConfig.CheckUserRoles && _.has(routerEvent.route, 'role')) {
+        if (Webiny.Config.Js.CheckUserRoles && _.has(routerEvent.route, 'role')) {
             return new Promise((resolve) => {
                 const user = Webiny.Model.get('User');
 
@@ -198,7 +203,7 @@ class Auth {
      */
     verifyUser(apiResponse) {
         const data = apiResponse.getData();
-        if (!this.isAuthorized(data)) {
+        if (apiResponse.isError() || !this.isAuthorized(data)) {
             return this.logout();
         }
         Webiny.Model.set('User', data);
