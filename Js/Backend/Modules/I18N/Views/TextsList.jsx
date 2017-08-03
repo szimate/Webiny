@@ -23,7 +23,20 @@ TextsList.defaultProps = {
                                     <Ui.View.Body>
                                         <Ui.List
                                             connectToRouter
-                                            title={this.i18n('Translations')}
+                                            title={this.i18n(`Translations
+                                            a
+                                            asd
+                                            ads
+                                            sda
+                                            ads
+                                            das
+                                            dasdsa
+
+                                            {asd|count123}
+                                            {asd123dd}
+
+                                            adssadads
+                                            `, {asd: 123, asd123dd: 555}, {key: 12111})}
                                             api="/entities/webiny/i18n-texts"
                                             searchFields="key,placeholder,app"
                                             fields="key,placeholder,app,translations"
@@ -79,19 +92,18 @@ class i18n {
         this.api = null;
         this.cacheKey = null;
 
+
         /**
          * All registered modifiers. We already have built-in modifiers 'count', 'case' and 'if'.
          * @type {Array}
          */
         this.modifiers = {
-            date: value => {
-              return 'DATE: ' + value;
+            if: (value, parameters) => {
+                // This is intentionally "==", because received parameters are all strings.
+                return value == parameters[0] ? parameters[1] : parameters[2] || '';
             },
-            time: value => {
-                return 'TIME: ' + value;
-            },
-            datetime: value => {
-                return 'DATETIME: ' + value;
+            gender: (value, parameters) => {
+                return value === 'male' ? parameters[0] : parameters[1];
             },
             plural: (value, parameters) => {
                 // Numbers can be single number or ranges.
@@ -111,8 +123,7 @@ class i18n {
                         continue;
                     }
 
-                    // This is intentionally "==", because received number might be a string, integer or float, so we want to avoid
-                    // type checking here. Also, numbers[0] is a string, since it was received by using .split() method.
+                    // This is intentionally "==", because received parameters are all strings.
                     if (value == numbers[0]) {
                         return value + ' ' + parameters[i + 1];
                     }
@@ -121,11 +132,17 @@ class i18n {
                 // If we didn't match any condition, let's just remove the received value.
                 return value;
             },
-            if: (variable, value, output1, output2) => {
-                if (variable === value) {
-                    return output1;
-                }
-                return output2;
+
+
+            // TODO: finish these one Locale settings are done.
+            date: value => {
+                return 'DATE: ' + value;
+            },
+            time: value => {
+                return 'TIME: ' + value;
+            },
+            datetime: value => {
+                return 'DATETIME: ' + value;
             }
         };
 

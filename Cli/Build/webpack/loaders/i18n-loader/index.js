@@ -1,8 +1,9 @@
 'use strict';
 const loaderUtils = require("loader-utils");
+const _ = require('lodash');
+const parser = require('./parser');
 
-const keyRegex = /this\.i18n\.key\s{0,}=\s{0,}['|"|`]([a-zA-Z0-9\.-_:]+)['|"|`]/;
-const stringRegex = /this\.i18n\(['|"|`]([a-zA-Z0-9\.\s-{}]+?)['|"|`]/gm;
+// TODO: maknuti ovo u developmentu - bildanje i18n fileova
 
 module.exports = function (source) {
     const options = loaderUtils.getOptions(this);
@@ -10,17 +11,11 @@ module.exports = function (source) {
         this.cacheable();
     }
 
-    let i18nKey;
-    if(i18nKey = keyRegex.exec(source)) {
-        i18nKey = i18nKey[1];
-    } else {
-        i18nKey = this.resourcePath.split('Apps/').pop().replace('/Js/', '/').replace(/\.jsx?/, '').replace(/\//g, '.');
-    }
+    const file = {path: this.resourcePath, key: parser.key(source, this.resourcePath)};
+    const occurrences = parser.methods(source);
 
-    let m;
-    while (m = stringRegex.exec(source)) {
-        options.addString(this.resourcePath, i18nKey, m[1]);
-    }
+    // This adds entries to the i18n.json file.
+    occurrences.forEach(occurrence => options.addText(file, occurrence));
 
     return source;
 };

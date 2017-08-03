@@ -3,6 +3,7 @@
 namespace Apps\Webiny\Php\View;
 
 use Apps\Webiny\Php\DevTools\WebinyTrait;
+use Apps\Webiny\Php\Entities\I18NLocale;
 use Apps\Webiny\Php\Services\Apps;
 use Webiny\Component\Config\ConfigObject;
 use Webiny\Component\StdLib\StdLibTrait;
@@ -80,6 +81,18 @@ class SmartyExtension extends AbstractSmartyExtension
             $browserSync = '<script src="' . $bsPath . '/browser-sync/browser-sync-client.js?v=2.18.6"></script>';
         }
 
+        // Loading i18n locale - basic information.
+        $i18n = ['locale' => null];
+        $locale = $this->wCookie()->get('webiny-i18n-locale');
+        if ($locale) {
+            $locale = I18NLocale::findOne(['key' => $locale, 'enabled' => true]);
+            if ($locale) {
+                $i18n['locale'] = $locale->toArray('key,cacheKey');
+            }
+        }
+
+        $i18n = json_encode($i18n);
+        
         return <<<EOT
     <script type="text/javascript">
         webinyConfig.Environment = '{$env}';
@@ -87,6 +100,7 @@ class SmartyExtension extends AbstractSmartyExtension
         webinyConfig.ApiPath = '{$apiPath}';
         webinyConfig.Js = {$config};
         webinyConfig.Meta = {$appsMeta};
+        webinyConfig.I18N = {$i18n};
     </script>
     <script src="{$meta['vendor']}" async></script> 
     {$browserSync}

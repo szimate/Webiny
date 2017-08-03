@@ -10,6 +10,14 @@ class LocalesList extends Webiny.Ui.View {
     }
 }
 
+
+
+
+
+
+
+
+
 LocalesList.defaultProps = {
     renderer: function render() {
         return (

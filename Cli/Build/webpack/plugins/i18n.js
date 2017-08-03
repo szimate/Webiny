@@ -11,7 +11,6 @@ class i18nPlugin {
         compiler.plugin('emit', (compilation, compileCallback) => {
             const content = {
                 app: compiler.options.name,
-                lang: "en-GB",
                 files: Object.values(this.i18n)
             };
 
@@ -34,14 +33,24 @@ class i18nPlugin {
         return {
             loader: 'i18n-loader',
             options: {
-                addString: (file, key, value) => {
-                    file = file.split('/Apps/').pop();
-                    const obj = this.i18n[file] || {file, key, strings: []};
-                    if (!_.find(obj.strings, {'default': value})) {
-                        obj.strings.push({'default': value, translation: ''});
+                /**
+                 * @param file Contains path and key
+                 * @param occurrence Contains placeholder with additional data (eg. 'key')
+                 */
+                addText: (file, occurrence) => {
+                    const path = file.path.split('/Apps/').pop();
+
+                    // If we don't have object with texts already, we create a new one.
+                    if (!this.i18n[path]) {
+                        this.i18n[path] = {path, key: file.key, texts: []}
                     }
-                    obj.strings = _.sortBy(obj.strings, ['default']);
-                    this.i18n[file] = obj;
+
+                    if (!_.find(this.i18n[path].texts, {placeholder: occurrence.placeholder})) {
+                        this.i18n[path].texts.push(occurrence);
+                    }
+
+                    // TODO: Ovaj sort na kraju napravit
+                    // this.i18n[path].texts = _.sortBy(this.i18n[path].texts, ['placeholder']);
                 }
             }
         };
