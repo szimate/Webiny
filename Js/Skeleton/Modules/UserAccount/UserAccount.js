@@ -2,10 +2,7 @@ import React from 'react';
 import Webiny from 'webiny';
 
 class UserAccount extends Webiny.Ui.View {
-    constructor() {
-        super();
 
-    }
 }
 
 UserAccount.defaultProps = {
@@ -50,10 +47,7 @@ UserAccount.defaultProps = {
                                     <Ui.Input label="Email" name="email" validate="required,email"/>
 
                                     <div className="form-group">
-                                        <label className="control-label">
-                                            {this.i18n(`Gravatar`)}
-                                            {this.i18n(`Bajo moj {asdx}`, {asdx: 123}, {key: 'asd'})}
-                                        </label>
+                                        <label className="control-label">Gravatar</label>
 
                                         <div className="input-group">
                                             <Ui.Gravatar hash={model.gravatar} size={100}/>
