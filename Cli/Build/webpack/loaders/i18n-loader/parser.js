@@ -1,5 +1,4 @@
 module.exports = {
-
     /**
      * When matching code for usage of i18n, it's possible to have three types (ordered by most used):
      * 1) this.i18n('Some text')

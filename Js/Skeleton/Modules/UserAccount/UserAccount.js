@@ -8,12 +8,6 @@ class UserAccount extends Webiny.Ui.View {
     }
 }
 
-
-
-
-
-
-
 UserAccount.defaultProps = {
     renderer() {
         const formContainer = {
