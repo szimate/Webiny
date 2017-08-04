@@ -4,7 +4,7 @@ services:
     nginx:
         image: nginx:alpine
         ports:
-            - "8070:80"
+            - "8000:80"
         volumes:
             - ./:/app
             - ./docker-nginx-default.conf:/etc/nginx/conf.d/default.conf
@@ -24,5 +24,5 @@ services:
         volumes:
           - ./data/db:/data/db
         ports:
-            - 8080:27017
+            - 8001:27017
         command: mongod --smallfiles --logpath=/dev/null # --quiet
