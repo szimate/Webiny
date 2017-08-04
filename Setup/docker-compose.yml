@@ -9,21 +9,10 @@ services:
             - ./:/app
             - ./docker-nginx-default.conf:/etc/nginx/conf.d/default.conf
 
-    php7:
-        image: adrian1210/php
+    php:
+        image: webiny/php7:dev
         volumes:
             - ./:/app:delegated
-        environment:
-            XDEBUG_CONFIG: "remote_host=192.168.5.14"
-        links:
-            - mongodb
-
-    composer:
-        entrypoint: /bin/true
-        image: composer
-        volumes:
-          - ./:/app
-        command: install --ignore-platform-reqs --no-scripts
 
     mongodb:
         image: mongo
