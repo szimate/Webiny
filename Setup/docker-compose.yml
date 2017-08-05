@@ -14,7 +14,7 @@ services:
         volumes:
             - ./:/app:delegated
         environment:
-            XDEBUG_CONFIG: "remote_host=0.0.0.0"
+            XDEBUG_CONFIG: "remote_enable=0 remote_host=0.0.0.0"
 
     mongodb:
         image: mongo
